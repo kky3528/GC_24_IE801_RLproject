@@ -167,7 +167,7 @@ class DQNPolicy(BasePolicy):
         self.q_net_target.set_training_mode(False)
         ### avg-dqn implementation
         self.using_avg_dqn = True
-        self.K = [3]
+        self.K = [10]
         self.q_net_target_list = []
         for k in range(self.K[0]):
             q_net_target_tmp = self.make_q_net()

@@ -22,9 +22,9 @@ from stable_baselines3.common.vec_env import VecEnv
 from stable_baselines3.her.her_replay_buffer import HerReplayBuffer
 
 ### guided-exploration implementation
-from keras.models import Sequential
-from keras.layers import Dense, Dropout
-from keras.optimizers import Adam
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.optimizers import Adam
 from scipy import stats
 import gc
 ### guided-exploration implementation
@@ -166,22 +166,22 @@ class OffPolicyAlgorithm(BaseAlgorithm):
     def explore(self, state):
         if not self.dynamics_model_converged: return self.action_space.sample() 
         N = self.replay_buffer.size()
-        num_samples = 80
-        # samples = []
-        # for i in range(N - num_samples, N):
-        #     samples.append(self.replay_buffer._get_samples(np.array([i]))[0].cpu().numpy())
-        # 241206 수정
-        fake_samples = []
-        fake_rewards = []
-        for i in range(N - 2*num_samples, N):
-            temp = self.replay_buffer._get_samples(np.array([i]))
-            fake_samples.append(temp[0].cpu().numpy())
-            fake_rewards.append(temp[4].cpu().item())
-        median = np.median(fake_rewards)
-        print(median)
-        indices = [i for i, x in enumerate(fake_rewards) if x <= median]
-        selected_indices = indices[:num_samples]
-        samples = [fake_samples[i] for i in selected_indices]
+        num_samples = 50
+        samples = []
+        for i in range(N - num_samples, N):
+            samples.append(self.replay_buffer._get_samples(np.array([i]))[0].cpu().numpy())
+        # # 241206 수정
+        # fake_samples = []
+        # fake_rewards = []
+        # for i in range(N - 2*num_samples, N):
+        #     temp = self.replay_buffer._get_samples(np.array([i]))
+        #     fake_samples.append(temp[0].cpu().numpy())
+        #     fake_rewards.append(temp[4].cpu().item())
+        # median = np.median(fake_rewards)
+        # print(median)
+        # indices = [i for i, x in enumerate(fake_rewards) if x <= median]
+        # selected_indices = indices[:num_samples]
+        # samples = [fake_samples[i] for i in selected_indices]
         
         least_p = np.inf
         best_a = -1
@@ -213,7 +213,7 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         model.add(Dense(24, input_shape=state_shape, activation="relu"))
         model.add(Dense(24, activation="relu"))
         model.add(Dense(self.observation_space.shape[0], activation='linear'))
-        model.compile(loss="mean_squared_error", optimizer=Adam(lr=0.02))
+        model.compile(loss="mean_squared_error", optimizer=Adam(learning_rate=0.02))
         return model
 
     def fit_dynamics_model(self):
